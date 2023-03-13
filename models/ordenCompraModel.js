@@ -19,6 +19,7 @@ const ordencompraSchema = new mongoose.Schema({
     isFormulado: { type: Boolean, default:false },
     isPagado: { type: Boolean, default:false },
     isPresupuestado: { type: Boolean, default:false },
+    isAuth: { type: Boolean, default:false },
     montoPedido: { type: Number,default:0 },
     descuento: { type: Number,default:0 },
     gastosEnvio: { type: Number,default:0 },

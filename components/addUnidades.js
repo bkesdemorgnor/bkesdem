@@ -14,10 +14,23 @@ const addUnidades =  async (productoId, prodReq) =>{
     const v_unidadesNombre = mUnidades.nombre.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
   //nombre = nombre.toUpperCase()
   if(nombre && familia && unidad && descripcion && tipo && grupo){
-    const oldProducto = await Unidades.findOne({nombre:{ $regex: new RegExp(`^${v_unidadesNombre}$`), $options: 'i' }})
-    if(oldProducto){
-        console.log('Tiene ya Unidades con el mismo Nombre, oldProducto',oldProducto);
-      return null
+    const oldUnidades = await Unidades.findOne({nombre:{ $regex: new RegExp(`^${v_unidadesNombre}$`), $options: 'i' }})
+    if(oldUnidades){
+      console.log('Tiene ya Unidades con el mismo Nombre, oldUnidades',oldUnidades);
+      /* Nota.- Aca llego con Unidades ya definidas pero no tiene Unidades detalle con nuevos parametros
+        Esto se verifico en proceso previo
+      */
+      const v_unidadesId = oldUnidades.unidadesId
+      console.log('v_unidadesId',v_unidadesId);
+      const v_new_UnidadesDet = await addUnidadesDet(v_unidadesId,productoId,prodReq);
+      if(v_new_UnidadesDet){
+        console.log('Unidades detalle creadas exitosamente v_new_UnidadesDet',v_new_UnidadesDet);
+        return oldUnidades
+      }else{
+        console.log('Unidades detalle NO creadas v_new_UnidadesDet',v_new_UnidadesDet);
+        return null
+      }    
+      //return null
     }else{
       var v_isAutoIngre = false;
       if(mIngredientes.asignar){
@@ -127,6 +140,7 @@ const addUnidades =  async (productoId, prodReq) =>{
       console.log('ingredienteId', ingredienteId);
       const ingrediente = new Ingrediente({
         ingredienteId: ingredienteId,
+        unidadesId: unidadesId,
         nombre: v_ingredienteNombre,
         familia: familia,
         unidad: mIngredientes.unidad,

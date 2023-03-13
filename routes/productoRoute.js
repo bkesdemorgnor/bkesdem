@@ -1,7 +1,9 @@
 const express = require('express');
 const Producto = require('../models/productoModel');
-const Ingrediente = require('../models/ingredienteModel');
+//const Ingrediente = require('../models/ingredienteModel');
 const Unidades = require('../models/unidadesModel');
+const Unidadesdet = require('../models/unidadesDetModel');
+const Kardex = require('../models/kardexModel');
 
 const { getSecuencia } = require('../components/GetSecuencia');
 const { getToken, isAuth } = require( '../util');
@@ -56,7 +58,6 @@ router.post("/grupo", isAuth, async (req, res) => {
   }
 });
 
-
 router.post("/familia", isAuth, async (req, res) => {
   console.log('get productos familia', req.body )
   const {familia} = req.body
@@ -104,9 +105,16 @@ router.post('/registrar', async (req, res) => {
         console.log('Requiere Unidades');
         const oldUnidades = await Unidades.findOne({nombre:{ $regex: new RegExp(`^${mUnidades.nombre}$`), $options: 'i' }})
         if(oldUnidades){
-          res.status(400).send({ message: 'Error: Unidades ya existente.' });
-          console.log('Error: Unidades ya existente.',mUnidades.nombre);
-          return
+          console.log('Unidades ya existe oldUnidades',oldUnidades);
+          const v_unidadesId = oldUnidades.unidadesId
+          const v_productoCantidad = mUnidades.productoCantidad
+          const v_unidadesCantidad = mUnidades.unidadesCantidad
+          const oldUnidadesDet = await Unidadesdet.findOne({unidadesId:v_unidadesId,productoFormula:v_productoCantidad,unidadesCantidad:v_unidadesCantidad})
+          if(oldUnidadesDet){
+            res.status(400).send({ message: 'Error: Unidades ya existente.' });
+            console.log('Error: Unidades ya existente.',mUnidades.nombre);
+            return
+          }
         }
       }
       const v_descripcion = descripcion.replace(/^\s+|\s+$|\s+(?=\s)/g, "");
@@ -183,6 +191,24 @@ router.post('/registrar', async (req, res) => {
   }else{
     console.log('Falta parametro(s) de Producto.',);
     res.status(400).send({ message: 'Falta parametro(s) de Producto.' });
+  }
+});
+
+router.delete("/:productoId", isAuth, async (req, res) => {
+  console.log('Producto delete params',req.params);
+  
+  const {productoId} = req.params
+  const producto = await Producto.findOne({ productoId: productoId });
+  if (producto) {
+    const deletedProducto = await producto.remove();
+    console.log('deletedProducto',deletedProducto);
+    
+    const productoKdx = await Kardex.deleteMany({ nombreId: productoId });
+    console.log('productoKdx',productoKdx);
+    
+    res.send(deletedProducto);
+  } else {
+    res.status(404).send("Producto Not Found.")
   }
 });
 

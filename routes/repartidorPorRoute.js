@@ -72,9 +72,9 @@ router.post("/grupo", isAuth, async (req, res) => {
 
 
 router.post('/registrar', async (req, res) => {
-  var {nombre, descripcion, grupo } = req.body;
+  var {nombre, descripcion, grupo,isEnvioGrupal } = req.body;
   //nombre = nombre.toUpperCase()
-  console.log('registrar nombre , descripcion, grupo',nombre, descripcion, grupo);
+  console.log('registrar nombre , descripcion, grupo',nombre, descripcion, grupo,isEnvioGrupal);
   const oldRepartidorPor = await Repartidorpor.findOne({nombre:{ $regex: new RegExp(`^${nombre}$`), $options: 'i' }})
   if(oldRepartidorPor){
     res.status(400).send({ message: 'Error: Formulario de Repartidor ya existe.' });
@@ -86,6 +86,7 @@ router.post('/registrar', async (req, res) => {
         nombre: nombre,
         descripcion:descripcion,
         grupo:grupo,
+        isEnvioGrupal:isEnvioGrupal,
     });
     const newRepartidorPor = await repartidorpor.save();
     if (newRepartidorPor) {
@@ -97,6 +98,7 @@ router.post('/registrar', async (req, res) => {
         nombre: newRepartidorPor.nombre,
         descripcion: newRepartidorPor.descripcion,
         grupo: newRepartidorPor.grupo,
+        isEnvioGrupal: newRepartidorPor.isEnvioGrupal,
       })
     } else {
       res.status(401).send({ message: 'Datos de Formulario de Repartidor invalidos.' });

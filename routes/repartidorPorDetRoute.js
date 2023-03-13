@@ -35,7 +35,7 @@ router.post("/ingredientes", isAuth, async (req, res) => {
 
 router.post('/registrar', async (req, res) => {
   console.log('repartidorPorcionDet registrar req.body ',req.body);
-  const {porcionId,porcionNombre,familia,repartidorPorId,grupo,rendimiento } = req.body
+  const {porcionId,porcionNombre,familias,repartidorPorId,grupo,rendimiento } = req.body
   
   const oldPorcionPorDet = await Repartidorpordet.findOne({porcionId:porcionId,repartidorPorId:repartidorPorId
 })
@@ -48,7 +48,7 @@ router.post('/registrar', async (req, res) => {
       porcionId:porcionId,
       porcionNombre:porcionNombre,
       repartidorPorId:repartidorPorId,
-      familia:familia,
+      familias:familias,
       grupo:grupo,
       rendimiento:rendimiento,
     });
@@ -60,7 +60,7 @@ router.post('/registrar', async (req, res) => {
         porcionId: newRepartidorPorcionDet.porcionId,     
         porcionNombre: newRepartidorPorcionDet.porcionNombre,     
         repartidorPorId: newRepartidorPorcionDet.repartidorPorId,     
-        familia: newRepartidorPorcionDet.familia,     
+        familias: newRepartidorPorcionDet.familias,     
         grupo: newRepartidorPorcionDet.grupo,     
         rendimiento: newRepartidorPorcionDet.rendimiento,     
       })

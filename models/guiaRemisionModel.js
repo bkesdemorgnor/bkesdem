@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const guiaremisionSchema = new mongoose.Schema({
     guiaRemisionId: { type: String, required: true },
+    repartePorSolId: { type: String },
+    reparteUndSolId: { type: String },
+    repartidorTipo: { type: String, required: true },
     nombre: { type: String, required: true },
     fecha: { type: String, required: true },
     destino: { type: String, required: true },
@@ -12,6 +15,8 @@ const guiaremisionSchema = new mongoose.Schema({
     transporte: { type: String},      // Pueden ser: porValidar, enAutoServicio, enManServicio, fueraServicio
     usuarioEnvio: { type: String, requerido: true },      // Pueden ser: porValidar, enAutoServicio, enManServicio, fueraServicio
     usuarioReceptor: { type: String },      // Pueden ser: porValidar, enAutoServicio, enManServicio, fueraServicio
+    isEnvioGrupal: { type: Boolean, requerido:true },      // Pueden ser: porValidar, enAutoServicio, enManServicio, fueraServicio
+    isEnvioPorcion: { type: Boolean, requerido:true },      // Pueden ser: porValidar, enAutoServicio, enManServicio, fueraServicio
     estado: { type: String, requerido: true },      // Pueden ser: porValidar, enAutoServicio, enManServicio, fueraServicio
     
 }, { timestamps: true });

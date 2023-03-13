@@ -301,8 +301,14 @@ router.post('/salida', async (req, res) => {
 router.post("/reglotesalida", isAuth, async (req, res) => {
   console.log('KardexDet registro de lote de salida body', req.body)
   const {loteSalida} = req.body;
- 
-  const v_resultado = await regLoteSalidaKardex(loteSalida)
+  const {ordenSalida,totalSalida,loteKardexSalida} = loteSalida
+  console.log('ordenSalida',ordenSalida); 
+  console.log('totalSalida',totalSalida); 
+  console.log('loteKardexSalida',loteKardexSalida); 
+  const v_loteSalida = loteKardexSalida[ordenSalida]
+  console.log('v_loteSalida',v_loteSalida); 
+  //const v_resultado = await regLoteSalidaKardex(loteSalida)
+  const v_resultado = await regLoteSalidaKardex(v_loteSalida)
   if(v_resultado){
     console.log('Registro Correcto de RegSalida', v_resultado);
     res.send({
@@ -313,41 +319,6 @@ router.post("/reglotesalida", isAuth, async (req, res) => {
     console.log('Error parametro reglotesalida no encontrada:',v_resultado);
     res.status(404).send({ message: 'Parametro reglotesalida no encontrados' });
   }
-
- /*  if  (loteSalida)  {
-      
-        var qtyErrores = 0
-        var qtyMontoTotal = 0
-        var qtyRegSalida = loteSalida.length
-
-        console.log('loteSalida.length',qtyRegSalida);
-        await loteSalida.forEach(async (ls)=>{
-          console.log('ls',ls);
-          const newRegSalida = await regSalidaKardex(ls);
-          if(newRegSalida){
-            console.log('newRegSalida exitoso:',newRegSalida);
-            const v_salidaTotal = newRegSalida.salidaTotal
-            qtyMontoTotal = qtyMontoTotal + parseFloat(v_salidaTotal)
-            console.log('v_salidaTotal',v_salidaTotal,"qtyMontoTotal",qtyMontoTotal);
-          }else{
-            console.log('newRegSalida',newRegSalida);
-            qtyErrores = qtyErrores+1
-          }
-        })
-        
-        //res.send({response1})
-        var v_resultado = { qtyRegSalida: qtyRegSalida, qtyErrores: qtyErrores, qtyMontoTotal: qtyMontoTotal }
-        //res.status(200).send('Exitoso Registro');
-        console.log('Registro Correcto de RegSalida', v_resultado);
-        res.send({
-          v_resultado
-        }) */
-  
-  /* }else{
-      console.log('Error parametro ventas no encontrada:',ventas);
-      res.status(404).send({ message: 'Parametro Ventas no encontrados' });
-  } */
-
 });
 
 
@@ -357,12 +328,14 @@ router.post("/regloteingreso", isAuth, async (req, res) => {
   console.log('loteIngreso',loteIngreso);
  
   const v_resultado = await regLoteIngresoKardex(loteIngreso);
+  
   if(v_resultado){
-    console.log('Registro exitoso de RegIngreso:',v_resultado);
-    res.send(v_resultado)
+    console.log('Registro exitoso de RegIngreso:');
+    res.send({v_resultado})
+    //res.send(v_resultado)
   }else{
-    console.log('Error parametro ventas no encontrada:',ventas);
-    res.status(404).send({ message: 'Parametro regLoteIngreso no encontrados' });
+    console.log('Error parametro ventas no encontrada:');
+    res.status(404).send({message:'Parametro regLoteIngreso no encontrados'});
   }
       
 });
@@ -395,7 +368,8 @@ router.post('/apertura', async (req, res) => {
       const newKardexDet = await kardexDet.save();
       if (newKardexDet) {
         const upKardex = await updatePromPorcionAuto(kardexId,Cantidad,Precio)
-        //console.log('upKardex',upKardex);
+        console.log('upKardex',upKardex);
+        console.log('newKardexDet',newKardexDet);
         res.send({
           _id:newKardexDet._id,
           kardexDetId:newKardexDet.kardexDetId,
@@ -431,14 +405,14 @@ const updatePromPorcionAuto = async (kardexId,stock,precio) =>{
     const oldkardex = await Kardex.findOne({ kardexId: kardexId})
     if (oldkardex) {
       if(oldkardex.isAutoProcess){
-        oldkardex.promSemana=stock
-        oldkardex.promLunes=stock * 0.1
-        oldkardex.promMartes=stock * 0.1
-        oldkardex.promMiercoles=stock * 0.1
-        oldkardex.promJueves=stock * 0.13
-        oldkardex.promViernes=stock * 0.17
-        oldkardex.promSabado=stock * 0.2
-        oldkardex.promDomingo=stock * 0.2
+        oldkardex.promSemana=stock * 1.2  /* Es un calculo inicial para los promedios al stock se le añade 20% */
+        oldkardex.promLunes=stock * 0.1 * 1.2
+        oldkardex.promMartes=stock * 0.1 * 1.2
+        oldkardex.promMiercoles=stock * 0.1 * 1.2
+        oldkardex.promJueves=stock * 0.13 * 1.2
+        oldkardex.promViernes=stock * 0.17 * 1.2
+        oldkardex.promSabado=stock * 0.2 * 1.2
+        oldkardex.promDomingo=stock * 0.2 * 1.2
       }else{
         oldkardex.promSemana=0
         oldkardex.promLunes=0

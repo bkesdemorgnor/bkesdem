@@ -173,18 +173,18 @@ const regLoteIngresoKardex =  async (loteIngreso) =>{
         
         
         
+        v_result = {qtyRegIngreso:qtyRegIngreso,qtyErrores:qtyErrores,qtyMontoTotal:qtyMontoTotal}
+        console.log('v_result',v_result);
+        //res.send({response1})
+        /* var v_resultado = await Promise.all([v_result]) 
+        //res.status(200).send('Exitoso Registro');
+        console.log('v_result',await v_result); */
+       
+        return v_result
     } catch (error) {
         console.log('error',error);
-        //return null
+        return null
     }
-    v_result = {qtyRegIngreso:qtyRegIngreso,qtyErrores:qtyErrores,qtyMontoTotal:qtyMontoTotal}
-    console.log('v_result',v_result);
-    //res.send({response1})
-    /* var v_resultado = await Promise.all([v_result]) 
-    //res.status(200).send('Exitoso Registro');
-    console.log('v_result',await v_result); */
-   
-    return v_result
 }
 
 

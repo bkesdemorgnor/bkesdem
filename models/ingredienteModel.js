@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const ingredienteSchema = new mongoose.Schema({
     ingredienteId: { type: String, required: true },
+    unidadesId: { type: String, required: true },
     nombre: { type: String, required: true },
     unidad: { type: String, required: true },
     descripcion: { type: String, required: true },

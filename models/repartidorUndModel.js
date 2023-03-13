@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
-const repartidorporSchema = new mongoose.Schema({
-    repartidorPorId: { type: String, required: true },
+const repartidorundSchema = new mongoose.Schema({
+    repartidorUndId: { type: String, required: true },
     nombre: { type: String, required: true },
     descripcion: { type: String, required: true },
     grupo: { type: String, required: true },     
     isEnvioGrupal: { type: Boolean, required: true },     
 }, { timestamps: true });
 
-const repartidorporModel = mongoose.model('Repartidorpor', repartidorporSchema);
+const repartidorundModel = mongoose.model('Repartidorund', repartidorundSchema);
 
-module.exports = repartidorporModel;
+module.exports = repartidorundModel;

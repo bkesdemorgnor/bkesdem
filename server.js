@@ -15,9 +15,15 @@ const productoRoute = require('./routes/productoRoute');
 const formulaRoute = require('./routes/formulaRoute');
 const formuladetalleRoute = require('./routes/formulaDetRoute');
 const porcionRoute = require('./routes/porcionRoute');
+
 const repartidorPorRoute = require('./routes/repartidorPorRoute');
 const repartidorPorDetRoute = require('./routes/repartidorPorDetRoute');
 const repartePorSolRoute = require('./routes/repartePorSolRoute');
+
+const repartidorUndRoute = require('./routes/repartidorUndRoute');
+const repartidorUndDetRoute = require('./routes/repartidorUndDetRoute');
+const reparteUndSolRoute = require('./routes/reparteUndSolRoute');
+
 const porciondetalleRoute = require('./routes/porcionDetRoute');
 const pedformRoute = require('./routes/pedformRoute');
 const pedformdetalleRoute = require('./routes/pedformDetRoute');
@@ -53,6 +59,12 @@ const unidadesdetalleRoute = require('./routes/unidadesDetRoute');
 const diarioAlmacenRoute = require('./routes/diarioAlmacenRoute');
 const cuentaRoute = require('./routes/cuentaRoute');
 const transporteRoute = require('./routes/transporteRoute');
+const tipoOperacionRoute = require('./routes/tipoOperacionRoute');
+const pagoProveedorRoute = require('./routes/pagoProveedorRoute');
+const ingresoGastoTipoRoute = require('./routes/ingresoGastoTipoRoute');
+const ingresoGastoRoute = require('./routes/ingresoGastoRoute');
+const notificacionRoute = require('./routes/notificacionRoute');
+const transferSolRoute = require('./routes/transferSolRoute');
 
 
 const cors = require('cors');
@@ -86,9 +98,15 @@ app.use('/api/sucursalTipos', sucursalTipoRoute);
 app.use('/api/productos', productoRoute);
 app.use('/api/formulas', formulaRoute);
 app.use('/api/formuladetalles', formuladetalleRoute);
+
 app.use('/api/repartidorporciones', repartidorPorRoute);
 app.use('/api/repartidorpordets', repartidorPorDetRoute);
 app.use('/api/reparteporsols', repartePorSolRoute);
+
+app.use('/api/repartidorunidades', repartidorUndRoute);
+app.use('/api/repartidorunddets', repartidorUndDetRoute);
+app.use('/api/reparteundsols', reparteUndSolRoute);
+
 app.use('/api/porciones', porcionRoute);
 app.use('/api/porciondetalles', porciondetalleRoute);
 app.use('/api/pedforms', pedformRoute);
@@ -125,6 +143,12 @@ app.use('/api/unidadesdetalles', unidadesdetalleRoute);
 app.use('/api/diarioalmacen', diarioAlmacenRoute);
 app.use('/api/cuentas', cuentaRoute);
 app.use('/api/transportes', transporteRoute);
+app.use('/api/tipooperaciones', tipoOperacionRoute);
+app.use('/api/pagoproveedores', pagoProveedorRoute);
+app.use('/api/ingresogastos', ingresoGastoRoute);
+app.use('/api/ingresogastotipos', ingresoGastoTipoRoute);
+app.use('/api/notificaciones', notificacionRoute);
+app.use('/api/transfersols', transferSolRoute);
 
 
 

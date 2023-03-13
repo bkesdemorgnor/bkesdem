@@ -208,6 +208,53 @@ router.post("/getlote", isAuth, async (req, res) => {
   }
 });
 
+
+/* Obtener la cantidad de registros del kardex detalle de un lote
+  Esto se aplica para corroborar si ya esta siendo utilizado el kardex, lo cual debe impedir ser eliminado
+  parametros:
+  lote: {nombreId:"UND-0001"}
+  lote: {nombreId:"PRO-0001"}
+  lote: {nombreId:"IN-0001"}
+  lote: {nombreId:"POR-0001"}
+*/
+router.post("/countregskdxdet", isAuth, async (req, res) => {
+  //console.log('get users', req )
+  const {lote} = req.body
+
+  var kardexRegsCount = await Kardex.aggregate([
+    // First Stage
+    {
+      $match : { $or:lote }
+     },
+     {$lookup: 
+      { from: "kardexdets", 
+        localField: "kardexId", 
+        foreignField: "kardexId", as: "kardexDetData"
+      }
+    }, 
+    { 
+     $addFields: {kardexDetCount: {$size: "$kardexDetData"}}
+    },
+    {
+     $group:{_id:{kardexId:"$kardexId",sucursal:"$sucursal"},total: {$sum:"$kardexDetCount"}}
+    }
+    // Second Stage
+  ])
+
+    
+  console.log('kardexRegsCount object.length',Object.entries(kardexRegsCount).length);
+  if(Object.entries(kardexRegsCount).length !== 0){
+    console.log('kardexRegsCount',kardexRegsCount);
+    res.send({
+      kardexRegsCount       
+    })
+  }else{
+    console.log('Datos de kardexRegsCount invalidos. ',kardexRegsCount);
+    res.status(404).send({ message: 'kardexRegsCount, detalle No EXISTE'});
+  }
+});
+
+
 /* Obtener los kardex de una sucursal y por el grupo que pertenecen  */
 router.post("/grupo", isAuth, async (req, res) => {
   console.log('get kardexs grupo', req.body )

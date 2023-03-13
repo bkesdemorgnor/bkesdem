@@ -91,11 +91,11 @@ const egresoRecetaDetKardex =  async (carta,venta,newVenta) =>{
                     if(oldItem.isAutoProcess){
                         console.log('Es AutoProcess',oldItem.nombre,'OldItem',oldItem);
                          //const oldkardex = await Kardex.findOne({ nombreId: rd.porcionId, sucursal: sucursal, kardextipo: "Porcion" })
-                        const oldkardex = await Kardex.findOne({ nombreId: rd.itemId, sucursal: sucursal, kardextipo: rd.tipoItem })
+                        const oldkardex = await Kardex.findOne({ nombreId: rd.itemId, sucursal: venta.sucursal, kardextipo: rd.tipoItem })
                         if (oldkardex) {
                             console.log('Tiene newVenta.producto:',newVenta.producto);
                             const descripcion = "Venta de - " + newVenta.producto;
-                            const result =  await saveEgresoKardex(rd.cantidad,newVenta.precio,newVenta.cantidad,newVenta.importe,fecha,descripcion,oldkardex) 
+                            const result =  await saveEgresoKardex(rd.cantidad,newVenta.precio,newVenta.cantidad,newVenta.importe,venta.fecha,descripcion,oldkardex) 
                             console.log('result',result);
                             
                         }else{

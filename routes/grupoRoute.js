@@ -48,12 +48,12 @@ router.post('/registrar', async (req, res) => {
               descripcion: newGrupo.descripcion,
             })
           } else {
-            res.status(401).send({ message: 'Datos de Grupo invalidos.' });
+            res.status(404).send({ message: 'Datos de Grupo invalidos.' });
           }
         }
     }else{
         console.log('No Llego nombre',nombre);
-        res.status(401).send({ message: 'Datos de Grupo invalidos.' });
+        res.status(404).send({ message: 'Datos de Grupo invalidos.' });
     }
 });
 

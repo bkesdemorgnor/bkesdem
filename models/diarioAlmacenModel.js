@@ -17,6 +17,7 @@ const diarioalmacenSchema = new mongoose.Schema({
     usuario: { type: String, required: true },
     sucursal: { type: String, required: true },
     estado: { type: String, required: true },
+    metodoPago: { type: String, required: true },       //Metodo de Pago tendra los valores: Contado, Credito, ContraEntrega
     isRecibido: { type: Boolean, required: true },
     isPagado: { type: Boolean, required: false,default:false },
     compraDetalles:[]

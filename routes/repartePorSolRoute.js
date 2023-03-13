@@ -22,10 +22,10 @@ router.get("/", isAuth, async (req, res) => {
   }
 });
 
-router.get("/:id", isAuth, async (req, res) => {
+router.get("/:repartePorSolId", isAuth, async (req, res) => {
   console.log('get reparteporsol Id', req.params )
-  const {id} = req.params;
-  const reparteporsol = await Reparteporsol.find({}).sort({ "nombre": -1 }).limit(100);
+  const {repartePorSolId} = req.params;
+  const reparteporsol = await Reparteporsol.find({repartePorSolId:repartePorSolId}).sort({ "nombre": -1 }).limit(100);
   if(reparteporsol){
     //const users = usersf.filter(usuario=>usuario.sucursal === "todos").map ((user)=>({name:user.name}))
     //res.send(users);
@@ -88,7 +88,7 @@ router.post("/estado", isAuth, async (req, res) => {
 
 
 router.post('/registrar', async (req, res) => {
-  var {fecha, fechaEntrega, estado,porcionesSol,grupo,nombre,repartidorPorId } = req.body;
+  var {fecha, fechaEntrega, estado,porcionesSol,grupo,nombre,repartidorPorId,isEnvioGrupal,isEnvioPorcion,repartidorTipo } = req.body;
   //nombre = nombre.toUpperCase()
   console.log('repartePorSol registrar req.body',req.body);
   const oldRepartePorSol = await Reparteporsol.findOne({fechaEntrega:fechaEntrega,repartidorPorId:repartidorPorId})
@@ -100,11 +100,14 @@ router.post('/registrar', async (req, res) => {
     const reparteporsol = new Reparteporsol({
         repartePorSolId:repartePorSolId,
         repartidorPorId:repartidorPorId,
+        repartidorTipo:repartidorTipo,
         fecha: fecha,
         fechaEntrega:fechaEntrega,
         estado:estado,
         grupo:grupo,
         nombre:nombre,
+        isEnvioGrupal:isEnvioGrupal,
+        isEnvioPorcion:isEnvioPorcion,
         porcionesSol:porcionesSol,
     });
     const newRepartePorSol = await reparteporsol.save();
@@ -115,11 +118,14 @@ router.post('/registrar', async (req, res) => {
         _id: newRepartePorSol._id,
         repartePorSolId: newRepartePorSol.repartePorSolId,
         repartidorPorId: newRepartePorSol.repartidorPorId,
+        repartidorTipo: newRepartePorSol.repartidorTipo,
         fecha: newRepartePorSol.fecha,
         fechaEntrega: newRepartePorSol.fechaEntrega,
         estado: newRepartePorSol.estado,
         grupo: newRepartePorSol.grupo,
         nombre: newRepartePorSol.nombre,
+        isEnvioGrupal: newRepartePorSol.isEnvioGrupal,
+        isEnvioPorcion: newRepartePorSol.isEnvioPorcion,
         porcionesSol: newRepartePorSol.porcionesSol,
       })
     } else {

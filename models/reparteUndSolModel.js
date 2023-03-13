@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const reparteporsolSchema = new mongoose.Schema({
-    repartePorSolId: { type: String, required: true },
-    repartidorPorId: { type: String, required: true },
+const reparteundsolSchema = new mongoose.Schema({
+    reparteUndSolId: { type: String, required: true },
+    repartidorUndId: { type: String, required: true },
     repartidorTipo: { type: String, required: true },
     fecha: { type: String, required: true },
     fechaEntrega: { type: String, required: true },
@@ -10,9 +10,9 @@ const reparteporsolSchema = new mongoose.Schema({
     nombre: { type: String, required: true },
     isEnvioGrupal: { type: Boolean, required: true },
     isEnvioPorcion: { type: Boolean, required: true, default:true },  // isEnvioPorcion: true = Se envia en transporte como PORCION, false : Se envia como UNIDADES    
-    porcionesSol: [],     
+    unidadesSol: [],     
 }, { timestamps: true });
 
-const reparteporsolModel = mongoose.model('Reparteporsol', reparteporsolSchema);
+const reparteundsolModel = mongoose.model('Reparteundsol', reparteundsolSchema);
 
-module.exports = reparteporsolModel;
+module.exports = reparteundsolModel;

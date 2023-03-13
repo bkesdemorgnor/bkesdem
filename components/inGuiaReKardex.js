@@ -14,19 +14,26 @@ const { getSecuencia } = require('./GetSecuencia');
     es porciones, unidades o productos
 */
 
-const inGuiaReKardex =  async (items,origen,destino,fecha,originalItems) =>{
+const inGuiaReKardex =  async (items,origen,destino,fecha,originalItems,guiaEnviado,isEnvioPorcion) =>{
    
-    console.log('inGuiaReKardex origen',origen,"destino",destino,"fecha",fecha);
+    console.log('inGuiaReKardex origen',origen,"destino",destino,"fecha",fecha,"guiaEnviado",guiaEnviado);
     console.log('inGuiaReKardex items',items);
     console.log('inGuiaReKardex originalItems',originalItems);
-    const v_resulGrabar = items.map(async (item,j)=>{
+    const originalItemsEnviado = originalItems[guiaEnviado]
+    console.log('originalItemsEnviado',originalItemsEnviado);
+    //const v_resulGrabar = items.map(async (item,j)=>{
+    const item = items[guiaEnviado]
         console.log('inGuiaReKardex item',item);
         const v_resulGrabarItem =  item.map(async (ite,i)=>{
             console.log('ite',ite);
-            console.log('index j:',j,"i:",i);
-            const v_origCheck = originalItems[j][i].checked
-            console.log('v_origCheck',v_origCheck);
-            if(v_origCheck){
+            console.log('index i:',i);
+            //const v_origCheck = originalItems[j][i].checked
+            const v_origCheck = originalItemsEnviado[i].checked
+            /* const v_origCheckItem = originalItems[j]
+            console.log('v_origCheckItem',v_origCheckItem);
+            const v_origCheckAlt = v_origCheckItem[i]
+            console.log('v_origCheck',v_origCheck); */
+            if(v_origCheck === true){
                 console.log('Ya esta grabado v_origCheck',v_origCheck);
                 console.log('inGuiaReKardex cantidad',ite.cantidadFinal,"unidadesId",ite.unidadesId,"unidadesNombreFinal",ite.unidadesNombreFinal);
             }else{
@@ -37,27 +44,29 @@ const inGuiaReKardex =  async (items,origen,destino,fecha,originalItems) =>{
                 const v_checked = ite.checked;
                 const v_isEnvioPorcion = ite.isEnvioPorcion;
                 console.log('inGuiaReKardex v_cantidad',v_cantidad,"v_unidadesId",v_unidadesId,"v_porcionId",v_porcionId,"v_checked",v_checked,"v_isEnvioPorcion",v_isEnvioPorcion);
+                
+                ////////////////////
                 if(v_checked){
                     //En esta condicion esta solicitado grabar en kardex
-                    if(v_isEnvioPorcion){
-                        //Condicion para grabar en kardex de Unidades
-                        console.log('grabar en kardex Origen de Porcion v_isEnvioPorcion=True:',v_isEnvioPorcion);
+                    if(isEnvioPorcion){
+                        //Condicion para grabar en kardex de Porciones 
+                        console.log('grabar en kardex Origen de Porcion v_isEnvioPorcion=True:',isEnvioPorcion);
                         var oldOrigenkardex = await Kardex.findOne({ nombreId: v_porcionId, sucursal: origen})
-
+    
                     }else{
-                        //Condicion para grabar en kardex de Porciones
-                        console.log('grabar en kardex Origen de Unidades v_isEnvioPorcion=False:',v_isEnvioPorcion);
+                        //Condicion para grabar en kardex de Unidades 
+                        console.log('grabar en kardex Origen de Unidades v_isEnvioPorcion=False:',isEnvioPorcion);
                         var oldOrigenkardex = await Kardex.findOne({ nombreId: v_unidadesId, sucursal: origen})
                     }
                     console.log('oldOrigenkardex',oldOrigenkardex);
                     if(oldOrigenkardex){
                         const v_precioFinalOrigen = oldOrigenkardex.ultimoPrecio
                         console.log('v_precioFinalOrigen',v_precioFinalOrigen);
-                        if(v_isEnvioPorcion){
-                            console.log('grabar en kardex Destino de Porciones v_isEnvioPorcion=True:',v_isEnvioPorcion);
+                        if(isEnvioPorcion){
+                            console.log('grabar en kardex Destino de Porciones v_isEnvioPorcion=True:',isEnvioPorcion);
                             var oldkardex = await Kardex.findOne({ nombreId: v_porcionId, sucursal: destino})     
                         }else{
-                            console.log('grabar en kardex Destino de Unidades v_isEnvioPorcion=False:',v_isEnvioPorcion);
+                            console.log('grabar en kardex Destino de Unidades v_isEnvioPorcion=False:',isEnvioPorcion);
                             var oldkardex = await Kardex.findOne({ nombreId: v_unidadesId, sucursal: destino})     
                         }
                         console.log('inGuiaReKardex oldkardex',oldkardex.nombre,oldkardex.sucursal,oldkardex.kardextipo,oldkardex.kardexId,oldkardex.nombreId);
@@ -79,13 +88,12 @@ const inGuiaReKardex =  async (items,origen,destino,fecha,originalItems) =>{
                         return null
                     
                     }
-                }
-                        
+                }           
             }
         })
         return v_resulGrabarItem
-    })
-    return v_resulGrabar
+    //})
+    //return v_resulGrabar
 }
 
  

@@ -35,26 +35,30 @@ const inDiarioAlmKardex =  async (reqDatosDiaAlm) =>{
             console.log('v_kardexId',v_kardexId);
             // Consulta de kardex Detalle de Producto .sort({ "nombre": -1 }).limit(25)
             const oldkardexDetalle = await Kardexdet.findOne({ kardexId: v_kardexId}).find().sort({$natural:-1}).limit(1);
-            console.log('oldkardexDetalle',oldkardexDetalle);
+            console.log('oldkardexDetalle',oldkardexDetalle,v_kardexId);
             if (oldkardexDetalle.length>0) {
                 const oldkardexDet = oldkardexDetalle[0]
 
                 // En kardex Detalle de Producto tiene ya registro de apertura
-                console.log('Tiene ya registro de apertura',oldkardexDet);
+                console.log('Tiene ya registro de apertura',oldkardexDet,v_kardexId);
                 const producto = await Producto.findOne({nombre:ocd.nombre})
                 if(producto){
                     console.log('Encontrado producto',producto);
                     console.log('Encontrado producto.isAutoUnidades',producto.isAutoUnidades);
                     const v_result_IngresoProducto = await ingresoKardexDetProducto(v_kardexId,proveedorNombre,fechaIngreso,ocd,oldkardexDet,oldkardex)
                     if(producto.isAutoUnidades){
+                        console.log('v_result_IngresoProducto',v_result_IngresoProducto,v_kardexId);
                         // Tiene conversion Automatica de Producto a Unidades
-                        const v_result_unidades = ingresoKardexDetUnidades(v_kardexId,proveedorNombre,fechaIngreso,ocd,sucursal)
+                        const v_result_unidades = await ingresoKardexDetUnidades(v_kardexId,proveedorNombre,fechaIngreso,ocd,sucursal)
                         // Para culminar el trasladado del Producto a Unidades
+                        console.log('v_result_unidades',v_result_unidades,v_kardexId);
                         // Realizamos la salida del Producto de su kardex de Productos
                         const oldkardexDetalle = await Kardexdet.findOne({ kardexId: v_kardexId}).find().sort({$natural:-1}).limit(1);
                         if(oldkardexDetalle.length>0){
+                            console.log('oldkardexDetalle',oldkardexDetalle,v_kardexId);
                             const oldkardexDet = oldkardexDetalle[0]
                             const v_result_SalidaProducto = await salidaKardexDetProducto(v_kardexId,proveedorNombre,fechaIngreso,ocd,oldkardexDet,oldkardex)
+                            console.log('v_result_SalidaProducto',v_result_SalidaProducto,v_kardexId);
                         }else{
                             console.log('No Tiene registro de apertura oldkardexDetalle',oldkardexDetalle);
                         }
@@ -71,6 +75,7 @@ const inDiarioAlmKardex =  async (reqDatosDiaAlm) =>{
                 console.log('No Tiene registro de apertura oldkardexDetalle',oldkardexDetalle);
                 //console.log('Tiene ya registro de apertura',oldkardexDet);
                 const v_result_IngresoProducto = await ingresoKardexDetProductoApertura(v_kardexId,proveedorNombre,fechaIngreso,ocd,oldkardex)
+                console.log('v_result_IngresoProducto',v_result_IngresoProducto,v_kardexId);
             }
             
         }else{
@@ -91,11 +96,11 @@ const ingresoKardexDetProducto =  async (kardexId,proveedorNombre,fecha,ocDetall
     const v_cantidadEnt = ocDetalles.cantidadEnt
     const v_precioEnt = ocDetalles.precioEnt
     const v_totalEnt = ocDetalles.totalEnt
-    console.log('ingresoKardexDetProducto ocDetalles',v_cantidadEnt,v_precioEnt,v_totalEnt);
+    console.log('ingresoKardexDetProducto ocDetalles',v_cantidadEnt,v_precioEnt,v_totalEnt,kardexId);
     const v_saldoCantidad = old_kardexDet.saldoCantidad
     const v_saldoPrecio = old_kardexDet.saldoPrecio
     const v_saldoTotal = old_kardexDet.saldoTotal
-    console.log('ingresoKardexDetProducto oldkardex',v_saldoCantidad,v_saldoPrecio,v_saldoTotal);
+    console.log('ingresoKardexDetProducto oldkardex',v_saldoCantidad,v_saldoPrecio,v_saldoTotal,kardexId);
 
    
 
@@ -106,7 +111,7 @@ const ingresoKardexDetProducto =  async (kardexId,proveedorNombre,fecha,ocDetall
     }else{
         var v_newSaldoPrecio = v_newSaldoTotal / v_newSaldoCantidad
     }
-    console.log('ingresoKardexDetProducto newkardexDet',v_newSaldoTotal,v_newSaldoCantidad,v_newSaldoPrecio);
+    console.log('ingresoKardexDetProducto newkardexDet',v_newSaldoTotal,v_newSaldoCantidad,v_newSaldoPrecio,kardexId);
     const kardexDetId = await getSecuencia("Kardexdetalle");
     console.log('ingresoKardexDetProducto kardexDetId',kardexDetId);
     var kardexDet = new Kardexdet({
@@ -124,11 +129,11 @@ const ingresoKardexDetProducto =  async (kardexId,proveedorNombre,fecha,ocDetall
     });
     const newKardexDet = await kardexDet.save();
     if (newKardexDet) {
-        console.log('ingresoKardexDetProducto Grabacion correcta de Ingreso de Producto en KardexDet',newKardexDet);
+        console.log('ingresoKardexDetProducto Grabacion correcta de Ingreso de Producto en KardexDet',newKardexDet,kardexId);
         await updateStockPrecio(oldkardex,newKardexDet)
         return newKardexDet
     }else{
-        console.log('ingresoKardexDetProducto No se grabo Ingreso de Producto en KardexDet',newKardexDet);
+        console.log('ingresoKardexDetProducto No se grabo Ingreso de Producto en KardexDet',newKardexDet,kardexId);
         return newKardexDet
     }
 }
@@ -189,11 +194,11 @@ const salidaKardexDetProducto =  async (kardexId,proveedorNombre,fecha,ocDetalle
     const v_cantidadEnt = ocDetalles.cantidadEnt
     const v_precioEnt = ocDetalles.precioEnt
     const v_totalEnt = ocDetalles.totalEnt
-    console.log('salidaKardexDetProducto ocDetalles',v_cantidadEnt,v_precioEnt,v_totalEnt);
+    console.log('salidaKardexDetProducto ocDetalles',v_cantidadEnt,v_precioEnt,v_totalEnt,kardexId);
     const v_saldoCantidad = old_kardexDet.saldoCantidad
     const v_saldoPrecio = old_kardexDet.saldoPrecio
     const v_saldoTotal = old_kardexDet.saldoTotal
-    console.log('salidaKardexDetProducto oldkardex',v_saldoCantidad,v_saldoPrecio,v_saldoTotal);
+    console.log('salidaKardexDetProducto oldkardex',v_saldoCantidad,v_saldoPrecio,v_saldoTotal,kardexId);
 
     var v_newSaldoTotal = v_saldoTotal - v_totalEnt
     var v_newSaldoCantidad = v_saldoCantidad - v_cantidadEnt
@@ -202,7 +207,7 @@ const salidaKardexDetProducto =  async (kardexId,proveedorNombre,fecha,ocDetalle
     }else{
         var v_newSaldoPrecio = v_newSaldoTotal / v_newSaldoCantidad
     }
-    console.log('salidaKardexDetProducto newkardexDet',v_newSaldoTotal,v_newSaldoCantidad,v_newSaldoPrecio);
+    console.log('salidaKardexDetProducto newkardexDet',v_newSaldoTotal,v_newSaldoCantidad,v_newSaldoPrecio,kardexId);
     const kardexDetId = await getSecuencia("Kardexdetalle");
     console.log('salidaKardexDetProducto kardexDetId',kardexDetId);
     var kardexDet = new Kardexdet({
@@ -220,11 +225,11 @@ const salidaKardexDetProducto =  async (kardexId,proveedorNombre,fecha,ocDetalle
     });
     const newKardexDet = await kardexDet.save();
     if (newKardexDet) {
-        console.log('salidaKardexDetProducto Grabacion correcta de Salida de Producto en KardexDet',newKardexDet);
+        console.log('salidaKardexDetProducto Grabacion correcta de Salida de Producto en KardexDet',newKardexDet,kardexId);
         await updateStockPrecio(oldkardex,newKardexDet)
         return newKardexDet
     }else{
-        console.log('salidaKardexDetProducto No se grabo salida de Producto en KardexDet',newKardexDet);
+        console.log('salidaKardexDetProducto No se grabo salida de Producto en KardexDet',newKardexDet,kardexId);
         return newKardexDet
     }
 }
@@ -239,29 +244,31 @@ const ingresoKardexDetUnidades =  async (kardexId,proveedorNombre,fecha,ocDetall
     // Si tiene AutoUnidades, vamos a consultar la tabla de UnidadesDet con el campo productoNombre
     // Vamos a obtener las formulas de conversion de Producto a Unidades
     //const oldUnidadesDet = await Unidadesdet.findOne({ productoNombre: ocDetalles.nombre});
-    const oldUnidadesDet = await Unidadesdet.findOne({ _id: ocDetalles.id});
+    //const oldUnidadesDet = await Unidadesdet.findOne({ _id: ocDetalles.id});
+    const oldUnidadesDet = await Unidadesdet.findOne({ unidadesId: ocDetalles.unidadesId});
     if(oldUnidadesDet){
-        console.log('ingresoKardexDetUnidades Tiene autoUnidades oldUnidadesDet',oldUnidadesDet);
+        console.log('ingresoKardexDetUnidades Tiene autoUnidades oldUnidadesDet',oldUnidadesDet,kardexId);
         const v_unidadesFormula = oldUnidadesDet.unidadesFormula
         const v_unidadesCantidad = oldUnidadesDet.unidadesCantidad
-        console.log('ingresoKardexDetUnidades v_unidadesFormula',v_unidadesFormula,v_unidadesCantidad);
-        console.log('ingresoKardexDetUnidades productoNombre',oldUnidadesDet.productoNombre);
+        console.log('ingresoKardexDetUnidades v_unidadesFormula',v_unidadesFormula,v_unidadesCantidad,kardexId);
+        console.log('ingresoKardexDetUnidades productoNombre',oldUnidadesDet.productoNombre,kardexId);
         const v_nombreUnidades = oldUnidadesDet.unidadesNombre
-        console.log('ingresoKardexDetUnidades v_nombreUnidades',v_nombreUnidades);
+        console.log('ingresoKardexDetUnidades v_nombreUnidades',v_nombreUnidades,kardexId);
 
         // Consulta de kardex de Unidades
         const v_kardexTipo = "Unidades"
-        console.log('Datos para buscar kardex unidades',ocDetalles.nombre,sucursal,v_kardexTipo);
+        console.log('Datos para buscar kardex unidades',ocDetalles.nombre,sucursal,v_kardexTipo,kardexId);
         const oldkardexUnidad = await Kardex.findOne({ nombre: v_nombreUnidades, sucursal: sucursal,kardextipo:v_kardexTipo})
         if(oldkardexUnidad){
            
             // Tiene Kardex de Unidades
-            console.log('Tiene oldkardexUnidad',oldkardexUnidad,);
+            console.log('Tiene oldkardexUnidad',oldkardexUnidad,kardexId);
             // Consulta de kardex Detalle de Producto .sort({ "nombre": -1 }).limit(25)
             await saveKardexUnidades(oldkardexUnidad,ocDetalles,proveedorNombre,fecha,v_unidadesFormula,v_unidadesCantidad)
+            return oldkardexUnidad
         }else{
 
-            console.log('ingresoKardexDetUnidades Error No hay Kardexunidad para Ingreso a Kardexdet',oldkardexUnidad);
+            console.log('ingresoKardexDetUnidades Error No hay Kardexunidad para Ingreso a Kardexdet',oldkardexUnidad,kardexId);
             return oldkardexUnidad
         }
 

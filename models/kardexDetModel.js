@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const kardexDetSchema = new mongoose.Schema({
     kardexDetId: {  type: String, required: true },
     kardexId: {  type: String, required: true },
-    fecha: { type: Date, required: true },
+    fecha: { type: String, required: true },
     descripcion: { type: String, required: true },
     isIngreso: { type: Boolean, required: true,default:true },
     ingresoCantidad: { type: Number, required: true,default:0 },

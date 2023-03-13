@@ -153,7 +153,10 @@ router.get("/:estado", isAuth, async (req, res) => {
   }
 });
 
-// Buscar todos los diarioAlmacen del isFlag(isRecibido, isFormulado, isPresupuestado, isPagado) que viene en isEstado 
+/* 
+  Buscar todos los diarioAlmacen del isFlag(isRecibido, isFormulado, isPresupuestado, isPagado) que viene en isEstado 
+  que tengan su valor en false
+ */
 router.post("/isestado", isAuth, async (req, res) => {
   console.log('get diarios de Almacen que tienen el isEstado solicitado en true', req.body )
   const {isEstado} = req.body
@@ -252,12 +255,60 @@ router.put("/isestadoon", isAuth, async (req, res) => {
 });
 
 
+// Poner el lote de _id's el isFlag(isRecibido, isFormulado, isPresupuestado, isPagado) recibido en isEstado en true
+router.put("/isestadoloteon", isAuth, async (req, res) => {
+  console.log('Diario Almacen Poner el lote _id el isEstado en true req.body', req.body )
+  const {loteId,isEstado} = req.body
+  console.log('isEstado',isEstado);
+  if("isFormulado" === isEstado || "isRecibido" === isEstado || isEstado === "isPresupuestado" || isEstado === "isPagado" || isEstado === "isAuth"){
+
+      switch(isEstado){
+        case "isFormulado":
+          console.log('isFormulado');
+          var diarioAlmacen = await Diarioalmacen.updateMany({ '_id':{$in:loteId }},{$set:{'isFormulado':true}});
+          break;
+        case "isRecibido":
+          console.log('isRecibido');
+          var diarioAlmacen = await Diarioalmacen.updateMany({ '_id':{$in:loteId }},{$set:{'isRecibido':true}});
+          break;
+        case "isPresupuestado":
+          console.log('isPresupuestado');
+          var diarioAlmacen = await Diarioalmacen.updateMany({ '_id':{$in:loteId }},{$set:{'isPresupuestado':true}});
+          break;
+        case "isPagado":
+          console.log('isPagado');
+          var diarioAlmacen = await Diarioalmacen.updateMany({ '_id':{$in:loteId }},{$set:{'isPagado':true}});
+          break;
+        case "isAuth":
+          console.log('isAuth');
+          var diarioAlmacen = await Diarioalmacen.updateMany({ '_id':{$in:loteId }},{$set:{'isAuth':true}});
+          break;
+        default:
+          console.log('Error Diario Almacen Default Parametro isEstado Inconrrecto');
+          res.status(404).send({ message: 'Error Diario Almacen Parametro isEstado Inconrrecto' })
+      }
+      
+      if(diarioAlmacen){
+        console.log('isEstado de ordenes de compras actualizado',diarioAlmacen)
+        res.send(diarioAlmacen);
+      }else{
+        console.log('Error en actualizacion de isEstado de Diarios Almacen',   diarioAlmacen);
+        res.status(404).send({ message: 'Error en Actualizacion de Diarios Almacen' });
+      }
+  
+  }else{
+    console.log('Error : Actualizacion de Diarios de Almacen - isEstado incorrecto',   isEstado);
+    res.status(404).send({ message: 'Error : Actualizacion de Diarios de Almacen - isEstado incorrecto' });
+  }
+});
+
+
 
 
 router.post('/registrar', async (req, res) => {
   console.log('registrar diarioAlmacen req.body ',req.body);
   var {nombre,estado,ordencompraId,nombreOrdenCompra,proveedorId,proveedorNombre,proveedorDireccion,compraId,descripcion,montoAtendido,
-    fechaIngreso,horaIngreso,fechaAtendido,docref,grupoDeCompra,sucursal,compraDetalles,isRecibido,usuario} = req.body
+    fechaIngreso,horaIngreso,fechaAtendido,docref,grupoDeCompra,sucursal,compraDetalles,isRecibido,usuario,metodoPago} = req.body
   //nombre = nombre.toUpperCase()
   if(nombre && ordencompraId && proveedorId && descripcion && proveedorNombre && montoAtendido){
     const oldDiarioAlmacen = await Diarioalmacen.findOne({nombre:{ $regex: new RegExp(`^${nombre}$`), $options: 'i' }})
@@ -284,6 +335,7 @@ router.post('/registrar', async (req, res) => {
         horaIngreso: horaIngreso,
         fechaAtendido: fechaAtendido,
         grupoDeCompra: grupoDeCompra,
+        metodoPago: metodoPago,
         usuario: usuario,
         sucursal: sucursal,
         estado: "Pendiente",
@@ -313,6 +365,7 @@ router.post('/registrar', async (req, res) => {
           horaIngreso: newDiario.horaIngreso,
           fechaAtendido: newDiario.fechaAtendido,
           grupoDeCompra: newDiario.grupoDeCompra,
+          metodoPago: newDiario.metodoPago,
           usuario: newDiario.usuario,
           sucursal: newDiario.sucursal,
           estado: newDiario.estado,
@@ -325,7 +378,7 @@ router.post('/registrar', async (req, res) => {
       }
     }
   }else{
-    console.log('Falta parametro(s) de Diario Almacen.',);
+    console.log('Falta parametro(s) de Diario Almacen. nombre:',nombre,'ordencompraId:', ordencompraId,'proveedorId:',proveedorId,'descripcion:',descripcion,'proveedorNombre:',proveedorNombre,'montoAtendido:',montoAtendido);
     res.status(400).send({ message: 'Falta parametro(s) de Diario Almacen.' });
   }
 });

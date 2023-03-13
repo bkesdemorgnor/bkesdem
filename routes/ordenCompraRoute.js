@@ -96,6 +96,66 @@ router.post("/estados", isAuth, async (req, res) => {
   }
 });
 
+
+/*  Buscar todas las ordenes de compra que vengan uno o varios de los isFlag(isRecibido, isFormulado, isPresupuestado, isPagado)
+  que viene con el estado true o false que soliciten 
+*/
+router.post("/isestados", isAuth, async (req, res) => {
+  console.log('get ordenes de compra (true o false) de todos los isFlag solicitados:', req.body )
+  const {isFlags, isEstados} = req.body
+  console.log('isFlags',isFlags,'isEstados',isEstados);
+  if(isFlags.length > 0){
+    const findStr = isFlags.map((flg,idx)=>{
+      console.log('flg',flg);
+      const v_flg = flg
+      if("isFormulado" === flg || "isRecibido" === flg || flg === "isPresupuestado" || flg === "isPagado" || flg === "isAuth"){
+        switch(flg){
+          case "isFormulado":
+            console.log('isFormulado',flg);
+            var v_isFlag = {isFormulado:isEstados[idx]}
+            break;
+          case "isRecibido":
+            console.log('isRecibido',flg);
+            var v_isFlag = {isRecibido:isEstados[idx]}
+            break;
+          case "isPresupuestado":
+            console.log('isPresupuestado',flg);
+            var v_isFlag = {isPresupuestado:isEstados[idx]}
+            break;
+          case "isPagado":
+            console.log('isPagado',flg);
+            var v_isFlag = {isPagado:isEstados[idx]}
+            break;
+          case "isAuth":
+            console.log('isAuth',flg);
+            var v_isFlag = {isAuth:isEstados[idx]}
+            break;
+          default:
+            console.log('Error: Incorrecto estado');
+        }
+        
+        console.log('v_isFlag',v_isFlag);
+        return v_isFlag
+      }
+    })
+    console.log('findStr',findStr);
+    var ordenes = await Ordencompra.find({ $and : findStr}).sort({ "updatedAt": -1 }).limit(100);
+    //console.log('Ordenes de compra',ordenes)
+        
+    if(ordenes){
+      console.log('Ordenes de compra con isEstado',ordenes)
+      res.send(ordenes);
+    }else{
+      console.log('Ordenes de Compra no encontrados',   ordenes);
+      res.status(404).send({ message: 'Ordenes de compra no encontrados' });
+    }
+  }else{
+    console.log('Error : Get orden de Compra - isEstado incorrecto',   isEstado);
+    res.status(404).send({ message: 'Error : Get orden de Compra - isEstado incorrecto' });
+  }
+});
+
+
 /*  Buscar todas las ordenes de compra del isFlag(isRecibido, isFormulado, isPresupuestado, isPagado) que viene en isEstado 
     que tengan el isFlag en False 
 */
@@ -194,7 +254,7 @@ router.put("/isestadoon", isAuth, async (req, res) => {
   console.log('Poner true ordenes de compra del isEstado req.body', req.body )
   const {_id,isEstado} = req.body
   console.log('isEstado',isEstado);
-  if("isFormulado" === isEstado || "isRecibido" === isEstado || isEstado === "isPresupuestado" || isEstado === "isPagado"){
+  if("isFormulado" === isEstado || "isRecibido" === isEstado || isEstado === "isPresupuestado" || isEstado === "isPagado" || isEstado === "isAuth"){
 
     var ordenCompra = await Ordencompra.findOne({ '_id':_id }).sort({ "updatedAt": -1 }).limit(1);
     if(ordenCompra){
@@ -214,6 +274,10 @@ router.put("/isestadoon", isAuth, async (req, res) => {
         case "isPagado":
           console.log('isPagado');
           ordenCompra.isPagado = true;
+          break;
+        case "isAuth":
+          console.log('isAuth');
+          ordenCompra.isAuth = true;
           break;
         default:
           console.log('Error Default Parametro isEstado Inconrrecto');
@@ -244,6 +308,54 @@ router.put("/isestadoon", isAuth, async (req, res) => {
 });
 
 
+// Poner el lote de _id's el isFlag(isRecibido, isFormulado, isPresupuestado, isPagado) recibido en isEstado en true
+router.put("/isestadoloteon", isAuth, async (req, res) => {
+  console.log('Poner el lote _id el isEstado en true req.body', req.body )
+  const {loteId,isEstado} = req.body
+  console.log('isEstado',isEstado);
+  if("isFormulado" === isEstado || "isRecibido" === isEstado || isEstado === "isPresupuestado" || isEstado === "isPagado" || isEstado === "isAuth"){
+
+      switch(isEstado){
+        case "isFormulado":
+          console.log('isFormulado');
+          var ordenCompra = await Ordencompra.updateMany({ '_id':{$in:loteId }},{$set:{'isFormulado':true}});
+          break;
+        case "isRecibido":
+          console.log('isRecibido');
+          var ordenCompra = await Ordencompra.updateMany({ '_id':{$in:loteId }},{$set:{'isRecibido':true}});
+          break;
+        case "isPresupuestado":
+          console.log('isPresupuestado');
+          var ordenCompra = await Ordencompra.updateMany({ '_id':{$in:loteId }},{$set:{'isPresupuestado':true}});
+          break;
+        case "isPagado":
+          console.log('isPagado');
+          var ordenCompra = await Ordencompra.updateMany({ '_id':{$in:loteId }},{$set:{'isPagado':true}});
+          break;
+        case "isAuth":
+          console.log('isAuth');
+          var ordenCompra = await Ordencompra.updateMany({ '_id':{$in:loteId }},{$set:{'isAuth':true}});
+          break;
+        default:
+          console.log('Error Default Parametro isEstado Inconrrecto');
+          res.status(404).send({ message: 'Error Parametro isEstado Inconrrecto' })
+      }
+      
+      if(ordenCompra){
+        console.log('isEstado de ordenes de compras actualizado',ordenCompra)
+        res.send(ordenCompra);
+      }else{
+        console.log('Error en actualizacion de isEstado de Ordenes de Compra',   ordenCompra);
+        res.status(404).send({ message: 'Error en actualizacion de isEstado de Ordenes de Compra' });
+      }
+  
+  }else{
+    console.log('Error : Actualizacion de ordenes de Compra - isEstado incorrecto',   isEstado);
+    res.status(404).send({ message: 'Error : Actualizacion de ordenes de Compra - isEstado incorrecto' });
+  }
+});
+
+
 
 router.put("/updateestado", isAuth, async (req, res) => {
   console.log('Orden Compra updateestado', req.body )
@@ -269,11 +381,14 @@ router.put("/updateestado", isAuth, async (req, res) => {
 
 router.put("/update", isAuth, async (req, res) => {
   console.log('Orden Compra update', req.body )
-  const {_id,fechaAtendido,estado} = req.body
+  const {_id,fechaAtendido,estado, nombreProveedor,direccionProveedor,proveedorId} = req.body
   const ordenCompra = await Ordencompra.findOne({ '_id':_id }).sort({ "updatedAt": -1 }).limit(1);
   if(ordenCompra){
     ordenCompra.estado = estado || ordenCompra.estado;
     ordenCompra.fechaAtendido = fechaAtendido || ordenCompra.fechaAtendido;
+    ordenCompra.nombreProveedor = nombreProveedor || ordenCompra.nombreProveedor;
+    ordenCompra.direccionProveedor = direccionProveedor || ordenCompra.direccionProveedor;
+    ordenCompra.proveedorId = proveedorId || ordenCompra.proveedorId;
     const updatedOrdenCompra = await ordenCompra.save();
     if(updatedOrdenCompra){
       console.log('updateestado ordenes de compra',ordenCompra)

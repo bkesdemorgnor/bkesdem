@@ -21,6 +21,22 @@ router.get("/", isAuth, async (req, res) => {
 });
 
 
+router.get("/proveedor/:proveedorId", isAuth, async (req, res) => {
+  console.log('get proveedor by Id', req.params )
+  const {proveedorId} = req.params
+  const proveedor = await Proveedor.findOne({proveedorId:proveedorId});
+  if(proveedor){
+    //const users = usersf.filter(usuario=>usuario.sucursal === "todos").map ((user)=>({name:user.name}))
+    //res.send(users);
+    res.send(proveedor);
+    //console.log('proveedores',proveedores)
+  }else{
+    res.status(404).send({ message: 'Proveedor no encontrado' });
+    console.log('proveedor no encontrado',proveedor)
+  }
+});
+
+
 router.post("/buscar", isAuth, async (req, res) => {
   console.log('Proveedor buscar', req.body )
   const {proveedor} = req.body
